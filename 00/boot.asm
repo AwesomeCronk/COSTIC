@@ -137,5 +137,20 @@ Reboot:
 	call LCDDelay
 	out (10h), a ; Contrast
 	
-	jr $
-	; Congrats!  You've booted up your calculator.  Now do something interesting.
+	ld iy, $8100
+	ld hl, SmileyFace
+	ld b, 4
+	ld de, 0
+	call PutSpriteOR
+	
+	call FastCopy
+	
+	call flushkeys
+	call waitkey
+	jp ShutDown
+	
+SmileyFace:
+	.db %01010000
+	.db %00000000
+	.db %10001000
+	.db %01110000
