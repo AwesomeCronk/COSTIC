@@ -9,7 +9,7 @@ OS.hex: 00/base.asm
 
 packxxu: OS.8xu
 OS.8xu: OS.hex
-	packxxu OS.hex -o OS.8xu -t 83p -q 0A -v 0.01 -h 255
+	pypackxxu OS.hex -o OS.8xu -t 83p -q 0A -v 0.01 -h 255
 
 rabbitsign: OS.8xu ~/Documents/TIKeys/010A.key
 	rabbitsign -t 8xu -k ~/Documents/TIKeys/010A.key -K 0A -g -p -r OS.8xu
