@@ -1,3 +1,22 @@
+# <OS name>
+<OS name> is an operating system for TI-84+ graphing calculators. You might be able to build it for other models, but I only target the TI-84+ specifically.
+
+## Features
+* Not much yet, actually
+
+## Future Features
+* Filesystem
+* Accounts
+* Multitasking?
+* First time startup program
+
+## Building
+`build.sh` is provided. You will need (SPASM-ng)[https://github.com/alberthdev/spasm-ng], (MultiHex)[https://github.com/lePerdu/ostools], (PyPackXXU)[https://github.com/AwesomeCronk/pypackxxu], and (RabbitSign)[https://www.ticalc.org/archives/files/fileinfo/383/38392.html] to run it. For Linux users with APT, RabbitSign is also available there. One last thing you will need is the (app signing keys)[https://brandonw.net/calculators/keys/] for TI calculators. The linked page has a .zip near the bottom with all the keys included.
+
+## Installing
+If you have Boot code v1.02 or lower, you're good to install. If you have boot code v1.03 you'll need to use (Unsigned)[https://www.ticalc.org/archives/files/fileinfo/441/44190.html] to crack it. Note that if you do use Unsigned, file transfers from PC to the calculator will hang at the end because no confirmation will be sent to the PC. This is just a limitation of how Unsigned works. After that, send the .8xu file to the calculator. On physical calculators (not emulators) I think you need to remove a battery, then reinsert the battery while holding down `[Del]`, before sending the .8xu.
+
+## Original AsmOS `readme.txt`
 The very first thing you should do is download the 02, 04, and 0A key files
 from http://brandonw.net and place them in the root of this folder.
 

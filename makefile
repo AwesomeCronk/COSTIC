@@ -5,7 +5,7 @@ clean:
 spasm: OS.hex
 
 OS.hex: 00/base.asm
-	spasm 00/base.asm OS.hex -DTI84Plus -DCPU15 -DUSB -DTOTALFLASH=64 '-DPRIVLEDGEDPAGE=$$3C' -I 00 -I priveleged
+	spasm 00/base.asm OS.hex -DTI84Plus -DCPU15 -DUSB -DTOTALFLASH=64 '-DPRIVLEDGEDPAGE=$$3C' -I 00 -I priveleged -T
 
 packxxu: OS.8xu
 OS.8xu: OS.hex

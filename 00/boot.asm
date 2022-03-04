@@ -136,7 +136,9 @@ Reboot:
 	ld a, $EF
 	call LCDDelay
 	out (10h), a ; Contrast
-	
+
+	; And from here start doing stuff
+
 	ld iy, $8100
 	ld hl, SmileyFace
 	ld b, 4
