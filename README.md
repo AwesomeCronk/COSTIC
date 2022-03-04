@@ -1,5 +1,5 @@
-# <OS name>
-<OS name> is an operating system for TI-84+ graphing calculators. You might be able to build it for other models, but I only target the TI-84+ specifically.
+# Capable Operating System for Texas Instruments Calculators (COSTIC)
+COSTIC is an operating system for TI-84+ graphing calculators. You might be able to build it for other models, but I only target the TI-84+ specifically.
 
 ## Features
 * Not much yet, actually
