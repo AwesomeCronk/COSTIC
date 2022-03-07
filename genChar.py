@@ -4,16 +4,17 @@ import pyperclip
 class window(QWidget):
     def __init__(self):
         QApplication.__init__(self)
-        self.px = [0] * 7 * 5
-        self.sizeX, self.sizeY = (120, 230)
+        self.pxSizeX, self.pxSizeY = (6, 8)
+        self.winSizeX, self.winSizeY = (self.pxSizeX * 20 + 20, self.pxSizeY * 20 + 90)
+        self.px = [0] * self.pxSizeX * self.pxSizeY
 
         self.initUI()
 
     def initUI(self):
-        self.setGeometry(100, 100, self.sizeX, self.sizeY)
+        self.setGeometry(100, 100, self.winSizeX, self.winSizeY)
         self.pxButtons = []
-        for y in range(7):
-            for x in range(5):
+        for y in range(self.pxSizeY):
+            for x in range(self.pxSizeX):
                 self.pxButtons.append(QPushButton(self))
                 self.pxButtons[-1].setGeometry(20 * x + 10, 20 * y + 10, 20, 20)
                 self.pxButtons[-1].setStyleSheet('background-color: white')
@@ -21,20 +22,20 @@ class window(QWidget):
 
         self.nameLabel = QLabel(self)
         self.nameLabel.setText('Name:')
-        self.nameLabel.move(10, 160)
+        self.nameLabel.move(10, self.pxSizeY * 20 + 20)
         self.nameEntry = QLineEdit(self)
-        self.nameEntry.setGeometry(70, 160, 40, 20)
+        self.nameEntry.setGeometry(70, self.pxSizeY * 20 + 20, 40, 20)
 
         self.addrLabel = QLabel(self)
         self.addrLabel.setText('Addr:')
-        self.addrLabel.move(10, 180)
+        self.addrLabel.move(10, self.pxSizeY * 20 + 40)
         self.addrEntry = QLineEdit(self)
-        self.addrEntry.setGeometry(70, 180, 40, 20)
+        self.addrEntry.setGeometry(70, self.pxSizeY * 20 + 40, 40, 20)
 
         self.exportButton = QPushButton(self)
         self.exportButton.setText('Export')
         self.exportButton.adjustSize()
-        self.exportButton.move((self.sizeX - int(self.exportButton.size().width())) / 2, self.sizeY - int(self.exportButton.size().height()))
+        self.exportButton.move((self.winSizeX - int(self.exportButton.size().width())) / 2, self.winSizeY - int(self.exportButton.size().height()))
         self.exportButton.clicked.connect(self.export)
 
         self.show()
@@ -52,12 +53,12 @@ class window(QWidget):
         addr = self.addrEntry.text()
         exportStr = 'ASCII_{}:'.format(name).ljust(12) + '; 0x{}'.format(addr.upper())
 
-        for y in range(7):
+        for y in range(self.pxSizeY):
             exportStr += '\n    .db %'
-            for x in range(5):
-                i = y * 5 + x
+            for x in range(self.pxSizeX):
+                i = y * self.pxSizeX + x
                 exportStr += str(self.px[i])
-            exportStr += '000'
+            exportStr = exportStr.ljust(9 + 8, '0')
 
         print('Export result:')
         print(exportStr)

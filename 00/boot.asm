@@ -101,7 +101,7 @@ Reboot:
     #endif
     #endif
     
-    ; Set intterupt mode
+    ; Set interrupt mode
     ld a, %0001011
     out (3), a
     
@@ -139,27 +139,22 @@ Reboot:
 
     ; And from here start doing stuff
     
+    ; Splash screen
     ld de, $0000
-    ld c, 0
+    ld c, $23
     call PutChar
 
     ld de, $0100
-    ld c, 1
+    ld c, $24
     call PutChar
 
-    ld de, $0001
-    ld c, 2
+    ld de, $0200
+    ld c, $25
     call putChar
 
     ld a, 80
     ld l, 80
     call setPixel
-    
-    ; ld iy, $8100
-	; ld hl, ASCII_NUL
-	; ld b, 7
-	; ld de, 0
-	; call PutSpriteOR
 
     call FastCopy
 
