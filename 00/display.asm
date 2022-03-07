@@ -7,20 +7,20 @@
 ; Clears an LCD buffer
 ; Input: IY: Buffer
 ClearBuffer:
-	push hl
-	push de
-	push bc
-		push iy \ pop hl
-		ld (hl), 0
-		ld d, h
-		ld e, l
-		inc de
-		ld bc, 767
-		ldir
-	pop bc
-	pop de
-	pop hl
-	ret
+    push hl
+    push de
+    push bc
+        push iy \ pop hl
+        ld (hl), 0
+        ld d, h
+        ld e, l
+        inc de
+        ld bc, 767
+        ldir
+    pop bc
+    pop de
+    pop hl
+    ret
 
 ;Input: IY: Buffer
 ;-----> Copy the gbuf to the screen, guaranteed 
@@ -30,114 +30,114 @@ BufferToLCD:
 BufCopy:
 FastCopy:
 SafeCopy:
-	push hl
-	push bc
-	push af
-	push de
-	ld a, i
-	push af
-	di                 ;DI is only required if an interrupt will alter the lcd.
-	push iy \ pop hl
-	;ld hl,$8000  ;This can be commented out or another entry placed after it
+    push hl
+    push bc
+    push af
+    push de
+    ld a, i
+    push af
+    di                 ;DI is only required if an interrupt will alter the lcd.
+    push iy \ pop hl
+    ;ld hl,$8000  ;This can be commented out or another entry placed after it
                            ;so the buffer can be provided by option.
-	ld c,$10
-	ld a,$80
+    ld c,$10
+    ld a,$80
 setrow:
-	in f,(c)
-	jp m,setrow
-	out ($10),a
-	ld de,12
-	ld a,$20
+    in f,(c)
+    jp m,setrow
+    out ($10),a
+    ld de,12
+    ld a,$20
 col:
-	in f,(c)
-	jp m,col
-	out ($10),a
-	push af
-	ld b,64
+    in f,(c)
+    jp m,col
+    out ($10),a
+    push af
+    ld b,64
 row:
-	ld a,(hl)
+    ld a,(hl)
 rowwait:
-	in f,(c)
-	jp m,rowwait
-	out ($11),a
-	add hl,de
-	djnz row
-	pop af
-	dec h
-	dec h
-	dec h
-	inc hl
-	inc a
-	cp $2c
-	jp nz,col
-	pop af
-	jp po, _
-	ei
-_:	
-	pop de
-	pop af
-	pop bc
-	pop hl
-	ret
-	
+    in f,(c)
+    jp m,rowwait
+    out ($11),a
+    add hl,de
+    djnz row
+    pop af
+    dec h
+    dec h
+    dec h
+    inc hl
+    inc a
+    cp $2c
+    jp nz,col
+    pop af
+    jp po, _
+    ei
+_:  
+    pop de
+    pop af
+    pop bc
+    pop hl
+    ret
+    
 LCDDelay:
-	push af
-_:	in a,($10)
+    push af
+_:  in a,($10)
     rla
     jr c,-_
-	pop af
-	ret
-	
+    pop af
+    ret
+    
 ; brief : utility for pixel manipulation
 ; input : a -> x coord, l -> y coord, IY -> graph buffer
 ; output : hl -> address in graph buffer, a -> pixel mask
 ; destroys : b, de
 getPixel:
-	ld	h, 0
-	ld	d, h
-	ld	e, l
-	
-	add	hl, hl
-	add	hl, de
-	add	hl, hl
-	add	hl, hl
-	
-	ld	e, a
-	srl	e
-	srl	e
-	srl	e
-	add	hl, de
-	
-	push iy \ pop de
-	add	hl, de
-	
-	and	7
-	ld	b, a
-	ld	a, $80
-	ret	z
-	
-	rrca
-	djnz	$-1
-	
-	ret
-	
+    ld  h, 0
+    ld  d, h
+    ld  e, l
+    
+    add hl, hl
+    add hl, de
+    add hl, hl
+    add hl, hl
+    
+    ld  e, a
+    srl e
+    srl e
+    srl e
+    add hl, de
+    
+    push iy \ pop de
+    add hl, de
+    
+    and 7
+    ld  b, a
+    ld  a, $80
+    ret z
+    
+    rrca
+    djnz    $-1
+    
+    ret
+    
 ; brief : set (darkens) a pixel in the graph buffer
 ; input : a -> x coord, l -> y coord
 ; output : none
 pixelOn:
 setPixel:
-	push hl
-	push de
-	push af
-	push bc
-		call	getPixel
-		or	(hl)
-		ld	(hl), a
-	pop bc
-	pop af
-	pop de
-	pop hl
-	ret
+    push hl
+    push de
+    push af
+    push bc
+        call    getPixel
+        or  (hl)
+        ld  (hl), a
+    pop bc
+    pop af
+    pop de
+    pop hl
+    ret
 
 ; brief : reset (lighten) a pixel in the graph buffer
 ; input : a -> x coord, l -> y coord
@@ -145,19 +145,19 @@ setPixel:
 ; destroys : a, b, de, hl
 pixelOff:
 resetPixel:
-	push hl
-	push de
-	push af
-	push bc
-		call	getPixel
-		cpl
-		and	(hl)
-		ld	(hl), a
-	pop bc
-	pop af
-	pop de
-	pop hl
-	ret
+    push hl
+    push de
+    push af
+    push bc
+        call    getPixel
+        cpl
+        and (hl)
+        ld  (hl), a
+    pop bc
+    pop af
+    pop de
+    pop hl
+    ret
 
 ; brief : flip (invert) a pixel in the graph buffer
 ; input : a -> x coord, l -> y coord
@@ -167,19 +167,19 @@ invertPixel:
 pixelFlip:
 pixelInvert:
 flipPixel:
-	push hl
-	push de
-	push af
-	push bc
-		call	getPixel
-		xor	(hl)
-		ld	(hl), a
-	pop bc
-	pop af
-	pop de
-	pop hl
-	ret
-	
+    push hl
+    push de
+    push af
+    push bc
+        call    getPixel
+        xor (hl)
+        ld  (hl), a
+    pop bc
+    pop af
+    pop de
+    pop hl
+    ret
+    
 ;Fast line routine, only sets pixels
 ;(d,e),(h,l) = (x1,y1),(x2,y2)
 ;IY = buffer
@@ -187,89 +187,89 @@ flipPixel:
 ;James Montelongo
 DrawLineOR:
 DrawLine:
-	push hl
-	push de
-	push bc
-	push af
-	push ix
-	push iy
-		call _DrawLine
-	pop iy
-	pop ix
-	pop af
-	pop bc
-	pop de
-	pop hl
-	ret
+    push hl
+    push de
+    push bc
+    push af
+    push ix
+    push iy
+        call _DrawLine
+    pop iy
+    pop ix
+    pop af
+    pop bc
+    pop de
+    pop hl
+    ret
 
 _DrawLine:
-	ld a,h
-	cp d
-	jp nc,noswapx
-	ex de,hl
+    ld a,h
+    cp d
+    jp nc,noswapx
+    ex de,hl
 noswapx:
 
-	ld a,h
-	sub d
-	jp nc,posx
-	neg
+    ld a,h
+    sub d
+    jp nc,posx
+    neg
 posx:
-	ld b,a
-	ld a,l
-	sub e
-	jp nc,posy
-	neg
+    ld b,a
+    ld a,l
+    sub e
+    jp nc,posy
+    neg
 posY:
-	ld c,a
-	ld a,l
-	ld hl,-12
-	cp e
-	jp c,lineup
-	ld hl,12
+    ld c,a
+    ld a,l
+    ld hl,-12
+    cp e
+    jp c,lineup
+    ld hl,12
 lineup:
-	ld ix,xbit
-	ld a,b
-	cp c
-	jp nc,xline
-	ld b,c
-	ld c,a
-	ld ix,ybit
+    ld ix,xbit
+    ld a,b
+    cp c
+    jp nc,xline
+    ld b,c
+    ld c,a
+    ld ix,ybit
 xline:
-	push hl
-	ld a,d
-	ld d,0
-	ld h,d
-	sla e
-	sla e
-	ld l,e
-	add hl,de
-	add hl,de
-	ld e,a
-	and %00000111
-	srl e
-	srl e
-	srl e
-	add hl,de
-	push iy \ pop de
-	;ld de,gbuf
-	add hl,de
-	add a,a
-	ld e,a
-	ld d,0
-	add ix,de
-	ld e,(ix)
-	ld d,(ix+1)
-	push hl
-	pop ix
-	ex de,hl
-	pop de
-	push hl
-	ld h,b
-	ld l,c
-	ld a,h
-	srl a
-	inc b
-	ret
+    push hl
+    ld a,d
+    ld d,0
+    ld h,d
+    sla e
+    sla e
+    ld l,e
+    add hl,de
+    add hl,de
+    ld e,a
+    and %00000111
+    srl e
+    srl e
+    srl e
+    add hl,de
+    push iy \ pop de
+    ;ld de,gbuf
+    add hl,de
+    add a,a
+    ld e,a
+    ld d,0
+    add ix,de
+    ld e,(ix)
+    ld d,(ix+1)
+    push hl
+    pop ix
+    ex de,hl
+    pop de
+    push hl
+    ld h,b
+    ld l,c
+    ld a,h
+    srl a
+    inc b
+    ret
 
 Xbit:
  .dw drawX0,drawX1,drawX2,drawX3
@@ -277,178 +277,178 @@ Xbit:
 Ybit:
  .dw drawY0,drawY1,drawY2,drawY3
  .dw drawY4,drawY5,drawY6,drawY7
-	
+    
 DrawX0:
-	set 7,(ix)
-	add a,c
-	cp h
-	jp c,$+3+2+1
-	add ix,de
-	sub h
-	djnz DrawX1
-	ret
+    set 7,(ix)
+    add a,c
+    cp h
+    jp c,$+3+2+1
+    add ix,de
+    sub h
+    djnz DrawX1
+    ret
 DrawX1:
-	set 6,(ix)
-	add a,c
-	cp h
-	jp c,$+3+2+1
-	add ix,de
-	sub h
-	djnz DrawX2
-	ret
+    set 6,(ix)
+    add a,c
+    cp h
+    jp c,$+3+2+1
+    add ix,de
+    sub h
+    djnz DrawX2
+    ret
 DrawX2:
-	set 5,(ix)
-	add a,c
-	cp h
-	jp c,$+3+2+1
-	add ix,de
-	sub h
-	djnz DrawX3
-	ret
+    set 5,(ix)
+    add a,c
+    cp h
+    jp c,$+3+2+1
+    add ix,de
+    sub h
+    djnz DrawX3
+    ret
 DrawX3:
-	set 4,(ix)
-	add a,c
-	cp h
-	jp c,$+3+2+1
-	add ix,de
-	sub h
-	djnz DrawX4
-	ret
+    set 4,(ix)
+    add a,c
+    cp h
+    jp c,$+3+2+1
+    add ix,de
+    sub h
+    djnz DrawX4
+    ret
 DrawX4:
-	set 3,(ix)
-	add a,c
-	cp h
-	jp c,$+3+2+1
-	add ix,de
-	sub h
-	djnz DrawX5
-	ret
+    set 3,(ix)
+    add a,c
+    cp h
+    jp c,$+3+2+1
+    add ix,de
+    sub h
+    djnz DrawX5
+    ret
 DrawX5:
-	set 2,(ix)
-	add a,c
-	cp h
-	jp c,$+3+2+1
-	add ix,de
-	sub h
-	djnz DrawX6
-	ret
+    set 2,(ix)
+    add a,c
+    cp h
+    jp c,$+3+2+1
+    add ix,de
+    sub h
+    djnz DrawX6
+    ret
 DrawX6:
-	set 1,(ix)
-	add a,c
-	cp h
-	jp c,$+3+2+1
-	add ix,de
-	sub h
-	djnz DrawX7
-	ret
+    set 1,(ix)
+    add a,c
+    cp h
+    jp c,$+3+2+1
+    add ix,de
+    sub h
+    djnz DrawX7
+    ret
 DrawX7:
-	set 0,(ix)
-	inc ix
-	add a,c
-	cp h
-	jp c,$+3+2+1
-	add ix,de
-	sub h
-	djnz DrawX0
-	ret
+    set 0,(ix)
+    inc ix
+    add a,c
+    cp h
+    jp c,$+3+2+1
+    add ix,de
+    sub h
+    djnz DrawX0
+    ret
 
 DrawY0_:
-	inc ix
-	sub h
-	dec b
-	ret z
+    inc ix
+    sub h
+    dec b
+    ret z
 DrawY0:
-	set 7,(ix)
-	add ix,de
-	add a,l
-	cp h
-	jp nc,DrawY1_
-	djnz DrawY0
-	ret
+    set 7,(ix)
+    add ix,de
+    add a,l
+    cp h
+    jp nc,DrawY1_
+    djnz DrawY0
+    ret
 DrawY1_:
-	sub h
-	dec b
-	ret z
+    sub h
+    dec b
+    ret z
 DrawY1:
-	set 6,(ix)
-	add ix,de
-	add a,l
-	cp h
-	jp nc,DrawY2_
-	djnz DrawY1
-	ret
+    set 6,(ix)
+    add ix,de
+    add a,l
+    cp h
+    jp nc,DrawY2_
+    djnz DrawY1
+    ret
 DrawY2_:
-	sub h
-	dec b
-	ret z
+    sub h
+    dec b
+    ret z
 DrawY2:
-	set 5,(ix)
-	add ix,de
-	add a,l
-	cp h
-	jp nc,DrawY3_
-	djnz DrawY2
-	ret
+    set 5,(ix)
+    add ix,de
+    add a,l
+    cp h
+    jp nc,DrawY3_
+    djnz DrawY2
+    ret
 DrawY3_:
-	sub h
-	dec b
-	ret z
+    sub h
+    dec b
+    ret z
 DrawY3:
-	set 4,(ix)
-	add ix,de
-	add a,l
-	cp h
-	jp nc,DrawY4_
-	djnz DrawY3
-	ret
+    set 4,(ix)
+    add ix,de
+    add a,l
+    cp h
+    jp nc,DrawY4_
+    djnz DrawY3
+    ret
 DrawY4_:
-	sub h
-	dec b
-	ret z
+    sub h
+    dec b
+    ret z
 DrawY4:
-	set 3,(ix)
-	add ix,de
-	add a,l
-	cp h
-	jp nc,DrawY5_
-	djnz DrawY4
-	ret
+    set 3,(ix)
+    add ix,de
+    add a,l
+    cp h
+    jp nc,DrawY5_
+    djnz DrawY4
+    ret
 DrawY5_:
-	sub h
-	dec b
-	ret z
+    sub h
+    dec b
+    ret z
 DrawY5:
-	set 2,(ix)
-	add ix,de
-	add a,l
-	cp h
-	jp nc,DrawY6_
-	djnz DrawY5
-	ret
+    set 2,(ix)
+    add ix,de
+    add a,l
+    cp h
+    jp nc,DrawY6_
+    djnz DrawY5
+    ret
 DrawY6_:
-	sub h
-	dec b
-	ret z
+    sub h
+    dec b
+    ret z
 DrawY6:
-	set 1,(ix)
-	add ix,de
-	add a,l
-	cp h
-	jp nc,DrawY7_
-	djnz DrawY6
-	ret
+    set 1,(ix)
+    add ix,de
+    add a,l
+    cp h
+    jp nc,DrawY7_
+    djnz DrawY6
+    ret
 DrawY7_:
-	sub h
-	dec b
-	ret z
+    sub h
+    dec b
+    ret z
 DrawY7:
-	set 0,(ix)
-	add ix,de
-	add a,l
-	cp h
-	jp nc,DrawY0_
-	djnz DrawY7
-	ret
+    set 0,(ix)
+    add ix,de
+    add a,l
+    cp h
+    jp nc,DrawY0_
+    djnz DrawY7
+    ret
 
 ; ====SPRITE ROUTINES====
 
@@ -458,20 +458,20 @@ DrawY7:
 ; HL = image address
 ; IY = buffer address
 PutSpriteXOR:
-	push af
-	push bc
-	push hl
-	push de
-	push ix
-		push hl \ pop ix
-		call _ClipSprXOR
-	pop ix
-	pop de
-	pop hl
-	pop bc
-	pop af
-	ret
-	
+    push af
+    push bc
+    push hl
+    push de
+    push ix
+        push hl \ pop ix
+        call _ClipSprXOR
+    pop ix
+    pop de
+    pop hl
+    pop bc
+    pop af
+    ret
+    
 _ClipSprXOR:
 ; Start by doing vertical clipping
     LD     A, %11111111         ; Reset clipping mask
@@ -617,27 +617,27 @@ _PutLoop:
     ADD    HL, DE
     DJNZ   _PutLoop
     RET
-	
+    
 ; D = xpos
 ; E = ypos
 ; B = height
 ; HL = image address
 ; IY = buffer address
 PutSpriteAND:
-	push af
-	push bc
-	push hl
-	push de
-	push ix
-		push hl \ pop ix
-		call _ClipSprAND
-	pop ix
-	pop de
-	pop hl
-	pop bc
-	pop af
-	ret
-	
+    push af
+    push bc
+    push hl
+    push de
+    push ix
+        push hl \ pop ix
+        call _ClipSprAND
+    pop ix
+    pop de
+    pop hl
+    pop bc
+    pop af
+    ret
+    
 _ClipSprAND:
 ; Start by doing vertical clipping
     LD     A, %11111111         ; Reset clipping mask
@@ -758,13 +758,13 @@ _ShiftLoop2:
     RR     C
     DJNZ   _ShiftLoop2
 
-	CPL
+    CPL
     AND    (HL)
     LD     (HL), A
 
     INC    HL
     LD     A, C
-	CPL
+    CPL
     AND    (HL)
     LD     (HL), A
 
@@ -779,34 +779,34 @@ _Aligned2:
 
 _PutLoop2:
     LD     A, (IX)
-	CPL
+    CPL
     AND    (HL)
     LD     (HL), A
     INC    IX
     ADD    HL, DE
     DJNZ   _PutLoop2
     RET
-	
+    
 ; D = xpos
 ; E = ypos
 ; B = height
 ; IX = image address
 ; IY = buffer address
 PutSpriteOR:
-	push af
-	push bc
-	push hl
-	push de
-	push ix
-		push hl \ pop ix
-		call _ClipSprOR
-	pop ix
-	pop de
-	pop hl
-	pop bc
-	pop af
-	ret
-	
+    push af
+    push bc
+    push hl
+    push de
+    push ix
+        push hl \ pop ix
+        call _ClipSprOR
+    pop ix
+    pop de
+    pop hl
+    pop bc
+    pop af
+    ret
+    
 _ClipSprOR:
 ; Start by doing vertical clipping
     LD     A, %11111111         ; Reset clipping mask
@@ -952,297 +952,297 @@ _PutLoop3:
     ADD    HL, DE
     DJNZ   _PutLoop3
     RET
-	
+    
 ; From Axe's Commands.inc by Quigibo
-; Inputs:	(e, l): X, Y
-;		(c, b): width, height
+; Inputs:   (e, l): X, Y
+;       (c, b): width, height
 RectXOR:
-	ld	a,96		;Clip Top
-	sub	e
-	ret	c
-	ret	z
-	cp	c		;Clip Bottom
-	jr	nc,$+3
-	ld	c,a
-	ld	a,64		;Clip Left
-	sub	l
-	ret	c
-	ret	z
-	cp	b		;Clip Right
-	jr	nc,$+3
-	ld	b,a
+    ld  a,96        ;Clip Top
+    sub e
+    ret c
+    ret z
+    cp  c       ;Clip Bottom
+    jr  nc,$+3
+    ld  c,a
+    ld  a,64        ;Clip Left
+    sub l
+    ret c
+    ret z
+    cp  b       ;Clip Right
+    jr  nc,$+3
+    ld  b,a
 
-	xor	a		;More clipping...
-	cp	b
-	ret	z
-	cp	c
-	ret	z
-	ld	h,a
-	ld	d,a
+    xor a       ;More clipping...
+    cp  b
+    ret z
+    cp  c
+    ret z
+    ld  h,a
+    ld  d,a
 
-	push	bc
-	push	iy
-	pop	bc
-	ld	a,l
-	add	a,a
-	add	a,l
-	ld	l,a
-	add	hl,hl
-	add	hl,hl		;(e,_) = (X,Y)
-	add	hl,bc		;(_,_) = (width,height)
+    push    bc
+    push    iy
+    pop bc
+    ld  a,l
+    add a,a
+    add a,l
+    ld  l,a
+    add hl,hl
+    add hl,hl       ;(e,_) = (X,Y)
+    add hl,bc       ;(_,_) = (width,height)
 
-	ld	a,e
-	srl	e
-	srl	e
-	srl	e
-	add	hl,de
-	and	%00000111	;(a,_) = (X^8,Y)
-	pop	de		;(e,d) = (width,height)
+    ld  a,e
+    srl e
+    srl e
+    srl e
+    add hl,de
+    and %00000111   ;(a,_) = (X^8,Y)
+    pop de      ;(e,d) = (width,height)
 
-	ld	b,a
-	add	a,e
-	sub	8
-	ld	e,0
-	jr	c,__BoxInvSkip
-	ld	e,a
-	xor	a
+    ld  b,a
+    add a,e
+    sub 8
+    ld  e,0
+    jr  c,__BoxInvSkip
+    ld  e,a
+    xor a
 __BoxInvSkip:
 
-__BoxInvShift:			;Input:  b = Left shift
-	add	a,8		;Input:  a = negative right shift
-	sub	b		;Output: a = mask
-	ld	c,0
+__BoxInvShift:          ;Input:  b = Left shift
+    add a,8     ;Input:  a = negative right shift
+    sub b       ;Output: a = mask
+    ld  c,0
 __BoxInvShift1:
-	scf
-	rr	c
-	dec	a
-	jr	nz,__BoxInvShift1
-	ld	a,c
-	inc	b
-	rlca
+    scf
+    rr  c
+    dec a
+    jr  nz,__BoxInvShift1
+    ld  a,c
+    inc b
+    rlca
 __BoxInvShift2:
-	rrca
-	djnz	__BoxInvShift2
+    rrca
+    djnz    __BoxInvShift2
 
-__BoxInvLoop1:			;(e,d) = (width,height)
-	push	hl		;    a = bitmask
-	ld	b,d
-	ld	c,a
-	push	de
-	ld	de,12
+__BoxInvLoop1:          ;(e,d) = (width,height)
+    push    hl      ;    a = bitmask
+    ld  b,d
+    ld  c,a
+    push    de
+    ld  de,12
 __BoxInvLoop2:
-	ld	a,c
-	xor	(hl)
-	ld	(hl),a
-	add	hl,de
-	djnz	__BoxInvLoop2
-	pop	de
-	pop	hl
-	inc	hl
-	ld	a,e
-	or	a
-	ret	z
-	sub	8
-	ld	e,b
-	jr	c,__BoxInvShift
-	ld	e,a
-	ld	a,%11111111
-	jr	__BoxInvLoop1
+    ld  a,c
+    xor (hl)
+    ld  (hl),a
+    add hl,de
+    djnz    __BoxInvLoop2
+    pop de
+    pop hl
+    inc hl
+    ld  a,e
+    or  a
+    ret z
+    sub 8
+    ld  e,b
+    jr  c,__BoxInvShift
+    ld  e,a
+    ld  a,%11111111
+    jr  __BoxInvLoop1
 __BoxInvEnd:
 
 ; From Axe's Commands.inc by Quigibo
-; Inputs:	(e, l): X, Y
-;		(c, b): width, height
+; Inputs:   (e, l): X, Y
+;       (c, b): width, height
 RectOR:
-	ld	a,96		;Clip Top
-	sub	e
-	ret	c
-	ret	z
-	cp	c		;Clip Bottom
-	jr	nc,$+3
-	ld	c,a
-	ld	a,64		;Clip Left
-	sub	l
-	ret	c
-	ret	z
-	cp	b		;Clip Right
-	jr	nc,$+3
-	ld	b,a
+    ld  a,96        ;Clip Top
+    sub e
+    ret c
+    ret z
+    cp  c       ;Clip Bottom
+    jr  nc,$+3
+    ld  c,a
+    ld  a,64        ;Clip Left
+    sub l
+    ret c
+    ret z
+    cp  b       ;Clip Right
+    jr  nc,$+3
+    ld  b,a
 
-	xor	a		;More clipping...
-	cp	b
-	ret	z
-	cp	c
-	ret	z
-	ld	h,a
-	ld	d,a
+    xor a       ;More clipping...
+    cp  b
+    ret z
+    cp  c
+    ret z
+    ld  h,a
+    ld  d,a
 
-	push	bc
-	push	iy
-	pop	bc
-	ld	a,l
-	add	a,a
-	add	a,l
-	ld	l,a
-	add	hl,hl
-	add	hl,hl		;(e,_) = (X,Y)
-	add	hl,bc		;(_,_) = (width,height)
+    push    bc
+    push    iy
+    pop bc
+    ld  a,l
+    add a,a
+    add a,l
+    ld  l,a
+    add hl,hl
+    add hl,hl       ;(e,_) = (X,Y)
+    add hl,bc       ;(_,_) = (width,height)
 
-	ld	a,e
-	srl	e
-	srl	e
-	srl	e
-	add	hl,de
-	and	%00000111	;(a,_) = (X^8,Y)
-	pop	de		;(e,d) = (width,height)
+    ld  a,e
+    srl e
+    srl e
+    srl e
+    add hl,de
+    and %00000111   ;(a,_) = (X^8,Y)
+    pop de      ;(e,d) = (width,height)
 
-	ld	b,a
-	add	a,e
-	sub	8
-	ld	e,0
-	jr	c,__BoxORSkip
-	ld	e,a
-	xor	a
+    ld  b,a
+    add a,e
+    sub 8
+    ld  e,0
+    jr  c,__BoxORSkip
+    ld  e,a
+    xor a
 __BoxORSkip:
 
-__BoxORShift:			;Input:  b = Left shift
-	add	a,8		;Input:  a = negative right shift
-	sub	b		;Output: a = mask
-	ld	c,0
+__BoxORShift:           ;Input:  b = Left shift
+    add a,8     ;Input:  a = negative right shift
+    sub b       ;Output: a = mask
+    ld  c,0
 __BoxORShift1:
-	scf
-	rr	c
-	dec	a
-	jr	nz,__BoxORShift1
-	ld	a,c
-	inc	b
-	rlca
+    scf
+    rr  c
+    dec a
+    jr  nz,__BoxORShift1
+    ld  a,c
+    inc b
+    rlca
 __BoxORShift2:
-	rrca
-	djnz	__BoxORShift2
+    rrca
+    djnz    __BoxORShift2
 
-__BoxORLoop1:			;(e,d) = (width,height)
-	push	hl		;    a = bitmask
-	ld	b,d
-	ld	c,a
-	push	de
-	ld	de,12
+__BoxORLoop1:           ;(e,d) = (width,height)
+    push    hl      ;    a = bitmask
+    ld  b,d
+    ld  c,a
+    push    de
+    ld  de,12
 __BoxORLoop2:
-	ld	a,c
-	or	(hl)
-	ld	(hl),a
-	add	hl,de
-	djnz	__BoxORLoop2
-	pop	de
-	pop	hl
-	inc	hl
-	ld	a,e
-	or	a
-	ret	z
-	sub	8
-	ld	e,b
-	jr	c,__BoxORShift
-	ld	e,a
-	ld	a,%11111111
-	jr	__BoxORLoop1
+    ld  a,c
+    or  (hl)
+    ld  (hl),a
+    add hl,de
+    djnz    __BoxORLoop2
+    pop de
+    pop hl
+    inc hl
+    ld  a,e
+    or  a
+    ret z
+    sub 8
+    ld  e,b
+    jr  c,__BoxORShift
+    ld  e,a
+    ld  a,%11111111
+    jr  __BoxORLoop1
 __BoxOREnd:
 
 ; From Axe's Commands.inc by Quigibo
-; Inputs:	(e, l): X, Y
-;		(c, b): width, height
+; Inputs:   (e, l): X, Y
+;       (c, b): width, height
 RectAND:
-	ld	a,96		;Clip Top
-	sub	e
-	ret	c
-	ret	z
-	cp	c		;Clip Bottom
-	jr	nc,$+3
-	ld	c,a
-	ld	a,64		;Clip Left
-	sub	l
-	ret	c
-	ret	z
-	cp	b		;Clip Right
-	jr	nc,$+3
-	ld	b,a
+    ld  a,96        ;Clip Top
+    sub e
+    ret c
+    ret z
+    cp  c       ;Clip Bottom
+    jr  nc,$+3
+    ld  c,a
+    ld  a,64        ;Clip Left
+    sub l
+    ret c
+    ret z
+    cp  b       ;Clip Right
+    jr  nc,$+3
+    ld  b,a
 
-	xor	a		;More clipping...
-	cp	b
-	ret	z
-	cp	c
-	ret	z
-	ld	h,a
-	ld	d,a
+    xor a       ;More clipping...
+    cp  b
+    ret z
+    cp  c
+    ret z
+    ld  h,a
+    ld  d,a
 
-	push	bc
-	push	iy
-	pop	bc
-	ld	a,l
-	add	a,a
-	add	a,l
-	ld	l,a
-	add	hl,hl
-	add	hl,hl		;(e,_) = (X,Y)
-	add	hl,bc		;(_,_) = (width,height)
+    push    bc
+    push    iy
+    pop bc
+    ld  a,l
+    add a,a
+    add a,l
+    ld  l,a
+    add hl,hl
+    add hl,hl       ;(e,_) = (X,Y)
+    add hl,bc       ;(_,_) = (width,height)
 
-	ld	a,e
-	srl	e
-	srl	e
-	srl	e
-	add	hl,de
-	and	%00000111	;(a,_) = (X^8,Y)
-	pop	de		;(e,d) = (width,height)
+    ld  a,e
+    srl e
+    srl e
+    srl e
+    add hl,de
+    and %00000111   ;(a,_) = (X^8,Y)
+    pop de      ;(e,d) = (width,height)
 
-	ld	b,a
-	add	a,e
-	sub	8
-	ld	e,0
-	jr	c,__BoxANDSkip
-	ld	e,a
-	xor	a
+    ld  b,a
+    add a,e
+    sub 8
+    ld  e,0
+    jr  c,__BoxANDSkip
+    ld  e,a
+    xor a
 __BoxANDSkip:
 
-__BoxANDShift:			;Input:  b = Left shift
-	add	a,8		;Input:  a = negative right shift
-	sub	b		;Output: a = mask
-	ld	c,0
+__BoxANDShift:          ;Input:  b = Left shift
+    add a,8     ;Input:  a = negative right shift
+    sub b       ;Output: a = mask
+    ld  c,0
 __BoxANDShift1:
-	scf
-	rr	c
-	dec	a
-	jr	nz,__BoxANDShift1
-	ld	a,c
-	inc	b
-	rlca
+    scf
+    rr  c
+    dec a
+    jr  nz,__BoxANDShift1
+    ld  a,c
+    inc b
+    rlca
 __BoxANDShift2:
-	rrca
-	djnz	__BoxANDShift2
+    rrca
+    djnz    __BoxANDShift2
 
-__BoxANDLoop1:			;(e,d) = (width,height)
-	push	hl		;    a = bitmask
-	ld	b,d
-	ld	c,a
-	push	de
-	ld	de,12
+__BoxANDLoop1:          ;(e,d) = (width,height)
+    push    hl      ;    a = bitmask
+    ld  b,d
+    ld  c,a
+    push    de
+    ld  de,12
 __BoxANDLoop2:
-	ld	a,c
-	cpl
-	and	(hl)
-	ld	(hl),a
-	add	hl,de
-	djnz	__BoxANDLoop2
-	pop	de
-	pop	hl
-	inc	hl
-	ld	a,e
-	or	a
-	ret	z
-	sub	8
-	ld	e,b
-	jr	c,__BoxANDShift
-	ld	e,a
-	ld	a,%11111111
-	jr	__BoxANDLoop1
+    ld  a,c
+    cpl
+    and (hl)
+    ld  (hl),a
+    add hl,de
+    djnz    __BoxANDLoop2
+    pop de
+    pop hl
+    inc hl
+    ld  a,e
+    or  a
+    ret z
+    sub 8
+    ld  e,b
+    jr  c,__BoxANDShift
+    ld  e,a
+    ld  a,%11111111
+    jr  __BoxANDLoop1
 __BoxANDEnd:
 
 ;2-byte (across) sprite xor routine by Jon Martin
@@ -1255,54 +1255,54 @@ __BoxANDEnd:
 ;hl=sprite pointer
 ;destroys all except shadow registers
 PutSprite16XOR:
-	push af
-	push hl
-	push bc
-	push de
-	push ix
-		push hl \ pop ix
-		ld a, d
-		call _PutSprite16XOR
-	pop ix
-	pop de
-	pop bc
-	pop hl
-	pop af
-	ret
+    push af
+    push hl
+    push bc
+    push de
+    push ix
+        push hl \ pop ix
+        ld a, d
+        call _PutSprite16XOR
+    pop ix
+    pop de
+    pop bc
+    pop hl
+    pop af
+    ret
 
-_PutSprite16XOR:				
- ld h,0	 		;7		
- ld l,e			;4		
- ld d,h 		;4
- add hl,hl		;11
- add hl,de		;11
- add hl,hl		;11
- add hl,hl		;11
- push iy \ pop de	;10
- add hl,de		;11
- ld e,a			;4
- srl e			;8
- srl e			;8
- srl e			;8
- ld d,0			;7
- add hl,de		;11
- ld d,h			;4
- ld e,l			;4
- and 7			;4
- jp z,aligned		;10
- ld c,a			;4
- ld de,12		;10
-rowloop:		;total: 194
- push bc		;11
- ld b,c 		;4
- xor a			;4
- ld d,(ix)		;19
- ld e,(ix+1)		;19
-shiftloop:		;60 per loop
- srl d			;8
- rr e			;8
- rra			;4
- djnz shiftloop		;13/8,37 per loop
+_PutSprite16XOR:                
+ ld h,0         ;7      
+ ld l,e         ;4      
+ ld d,h         ;4
+ add hl,hl      ;11
+ add hl,de      ;11
+ add hl,hl      ;11
+ add hl,hl      ;11
+ push iy \ pop de   ;10
+ add hl,de      ;11
+ ld e,a         ;4
+ srl e          ;8
+ srl e          ;8
+ srl e          ;8
+ ld d,0         ;7
+ add hl,de      ;11
+ ld d,h         ;4
+ ld e,l         ;4
+ and 7          ;4
+ jp z,aligned       ;10
+ ld c,a         ;4
+ ld de,12       ;10
+rowloop:        ;total: 194
+ push bc        ;11
+ ld b,c         ;4
+ xor a          ;4
+ ld d,(ix)      ;19
+ ld e,(ix+1)        ;19
+shiftloop:      ;60 per loop
+ srl d          ;8
+ rr e           ;8
+ rra            ;4
+ djnz shiftloop     ;13/8,37 per loop
  inc hl
  inc hl
  xor (hl)
@@ -1314,14 +1314,14 @@ shiftloop:		;60 per loop
  ld a,d
  dec hl
  xor (hl)
- ld (hl),a	
- pop bc			;10
- ld de,12		;10
- add hl,de		;11
- inc ix			;10
- inc ix			;10
- djnz rowloop		;13/8
- ret			;10
+ ld (hl),a  
+ pop bc         ;10
+ ld de,12       ;10
+ add hl,de      ;11
+ inc ix         ;10
+ inc ix         ;10
+ djnz rowloop       ;13/8
+ ret            ;10
 aligned:
  ld de,11 
 alignedloop:
@@ -1339,54 +1339,54 @@ alignedloop:
  ret
  
 PutSprite16OR:
-	push af
-	push hl
-	push bc
-	push de
-	push ix
-		push hl \ pop ix
-		ld a, d
-		call _PutSprite16OR
-	pop ix
-	pop de
-	pop bc
-	pop hl
-	pop af
-	ret
+    push af
+    push hl
+    push bc
+    push de
+    push ix
+        push hl \ pop ix
+        ld a, d
+        call _PutSprite16OR
+    pop ix
+    pop de
+    pop bc
+    pop hl
+    pop af
+    ret
 
-_PutSprite16OR:				
- ld h,0	 		;7		
- ld l,e			;4		
- ld d,h 		;4
- add hl,hl		;11
- add hl,de		;11
- add hl,hl		;11
- add hl,hl		;11
- push iy \ pop de	;10
- add hl,de		;11
- ld e,a			;4
- srl e			;8
- srl e			;8
- srl e			;8
- ld d,0			;7
- add hl,de		;11
- ld d,h			;4
- ld e,l			;4
- and 7			;4
- jp z,alignedOR		;10
- ld c,a			;4
- ld de,12		;10
-rowloopOR:		;total: 194
- push bc		;11
- ld b,c 		;4
- xor a			;4
- ld d,(ix)		;19
- ld e,(ix+1)		;19
-shiftloopOR:		;60 per loop
- srl d			;8
- rr e			;8
- rra			;4
- djnz shiftloopOR		;13/8,37 per loop
+_PutSprite16OR:             
+ ld h,0         ;7      
+ ld l,e         ;4      
+ ld d,h         ;4
+ add hl,hl      ;11
+ add hl,de      ;11
+ add hl,hl      ;11
+ add hl,hl      ;11
+ push iy \ pop de   ;10
+ add hl,de      ;11
+ ld e,a         ;4
+ srl e          ;8
+ srl e          ;8
+ srl e          ;8
+ ld d,0         ;7
+ add hl,de      ;11
+ ld d,h         ;4
+ ld e,l         ;4
+ and 7          ;4
+ jp z,alignedOR     ;10
+ ld c,a         ;4
+ ld de,12       ;10
+rowloopOR:      ;total: 194
+ push bc        ;11
+ ld b,c         ;4
+ xor a          ;4
+ ld d,(ix)      ;19
+ ld e,(ix+1)        ;19
+shiftloopOR:        ;60 per loop
+ srl d          ;8
+ rr e           ;8
+ rra            ;4
+ djnz shiftloopOR       ;13/8,37 per loop
  inc hl
  inc hl
  xor (hl)
@@ -1398,14 +1398,14 @@ shiftloopOR:		;60 per loop
  ld a,d
  dec hl
  or (hl)
- ld (hl),a	
- pop bc			;10
- ld de,12		;10
- add hl,de		;11
- inc ix			;10
- inc ix			;10
- djnz rowloopOR		;13/8
- ret			;10
+ ld (hl),a  
+ pop bc         ;10
+ ld de,12       ;10
+ add hl,de      ;11
+ inc ix         ;10
+ inc ix         ;10
+ djnz rowloopOR     ;13/8
+ ret            ;10
 alignedOR:
  ld de,11 
 alignedloopOR:
@@ -1423,54 +1423,54 @@ alignedloopOR:
  ret
  
 PutSprite16AND:
-	push af
-	push hl
-	push bc
-	push de
-	push ix
-		push hl \ pop ix
-		ld a, d
-		call _PutSprite16AND
-	pop ix
-	pop de
-	pop bc
-	pop hl
-	pop af
-	ret
+    push af
+    push hl
+    push bc
+    push de
+    push ix
+        push hl \ pop ix
+        ld a, d
+        call _PutSprite16AND
+    pop ix
+    pop de
+    pop bc
+    pop hl
+    pop af
+    ret
 
-_PutSprite16AND:				
- ld h,0	 		;7		
- ld l,e			;4		
- ld d,h 		;4
- add hl,hl		;11
- add hl,de		;11
- add hl,hl		;11
- add hl,hl		;11
- push iy \ pop de	;10
- add hl,de		;11
- ld e,a			;4
- srl e			;8
- srl e			;8
- srl e			;8
- ld d,0			;7
- add hl,de		;11
- ld d,h			;4
- ld e,l			;4
- and 7			;4
- jp z,alignedAND		;10
- ld c,a			;4
- ld de,12		;10
-rowloopAND:		;total: 194
- push bc		;11
- ld b,c 		;4
- xor a			;4
- ld d,(ix)		;19
- ld e,(ix+1)		;19
-shiftloopAND:		;60 per loop
- srl d			;8
- rr e			;8
- rra			;4
- djnz shiftloopAND		;13/8,37 per loop
+_PutSprite16AND:                
+ ld h,0         ;7      
+ ld l,e         ;4      
+ ld d,h         ;4
+ add hl,hl      ;11
+ add hl,de      ;11
+ add hl,hl      ;11
+ add hl,hl      ;11
+ push iy \ pop de   ;10
+ add hl,de      ;11
+ ld e,a         ;4
+ srl e          ;8
+ srl e          ;8
+ srl e          ;8
+ ld d,0         ;7
+ add hl,de      ;11
+ ld d,h         ;4
+ ld e,l         ;4
+ and 7          ;4
+ jp z,alignedAND        ;10
+ ld c,a         ;4
+ ld de,12       ;10
+rowloopAND:     ;total: 194
+ push bc        ;11
+ ld b,c         ;4
+ xor a          ;4
+ ld d,(ix)      ;19
+ ld e,(ix+1)        ;19
+shiftloopAND:       ;60 per loop
+ srl d          ;8
+ rr e           ;8
+ rra            ;4
+ djnz shiftloopAND      ;13/8,37 per loop
  inc hl
  inc hl
  xor (hl)
@@ -1484,14 +1484,14 @@ shiftloopAND:		;60 per loop
  dec hl
  cpl
  and (hl)
- ld (hl),a	
- pop bc			;10
- ld de,12		;10
- add hl,de		;11
- inc ix			;10
- inc ix			;10
- djnz rowloopAND		;13/8
- ret			;10
+ ld (hl),a  
+ pop bc         ;10
+ ld de,12       ;10
+ add hl,de      ;11
+ inc ix         ;10
+ inc ix         ;10
+ djnz rowloopAND        ;13/8
+ ret            ;10
 alignedAND:
  ld de,11 
 alignedloopAND:

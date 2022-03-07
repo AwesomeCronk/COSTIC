@@ -54,3 +54,8 @@ recently changed to support boot page start up, and this doesn't work with the
 generated ROMs.  An older version of WabbitEmu is provided for debugging.
 
 See documentation.txt for information.
+
+## Thanks
+All of the people listed here have my express thanks for their help in making this project a thing:
+* LogicalJoe on Cemetech Discord for help getting COSTIC to compile
+* SirCmpwn for SmileyOS/AsmOS, which I used as a base for COSTIC

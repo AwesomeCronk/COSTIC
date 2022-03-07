@@ -8,8 +8,8 @@ rm -rf build
 mkdir build
 
 echo "### SPASM-NG"
-spasm 00/base.asm build/Page-00.hex -DTI84Plus -DCPU15 -DUSB -DTOTALFLASH=64 '-DPRIVLEDGEDPAGE=$3C' -I 00
-spasm privledged/base.asm build/Page-privledged.hex -DTI84Plus -DCPU15 -DUSB -DTOTALFLASH=64 '-DPRIVLEDGEDPAGE=$3C' -I 3C
+spasm 00/base.asm build/Page-00.hex -DTI84Plus -DCPU15 -DUSB -DTOTALFLASH=64 '-DPRIVLEDGEDPAGE=$3C' -I 00 -T
+spasm privledged/base.asm build/Page-privledged.hex -DTI84Plus -DCPU15 -DUSB -DTOTALFLASH=64 '-DPRIVLEDGEDPAGE=$3C' -I 3C -T
 
 echo "### MultiHex"
 multihex 00 build/Page-00.hex 3C build/Page-privledged.hex > build/OS.hex
