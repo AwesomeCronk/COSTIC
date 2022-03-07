@@ -58,7 +58,7 @@ class window(QWidget):
             for x in range(self.pxSizeX):
                 i = y * self.pxSizeX + x
                 exportStr += str(self.px[i])
-            exportStr = exportStr.ljust(9 + 8, '0')
+            exportStr += '0' * (8 - self.pxSizeX)
 
         print('Export result:')
         print(exportStr)
