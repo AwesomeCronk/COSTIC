@@ -69,7 +69,7 @@ Sleep:
     ei
     ret
     
-DEMulA:          ; HL = DE × A
+DEMulA:          ; HL = DE ï¿½ A
     LD     HL, 0      ; Use HL to store the product
     LD     B, 8       ; Eight bits to check
 _loop:

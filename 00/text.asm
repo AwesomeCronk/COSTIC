@@ -684,7 +684,7 @@ ASCII_QST:  ; 0x3F
     .db %00100000
     .db %00000000
 
-ASCII_AMP:  ; 0x40
+ASCII_AT:   ; 0x40
     .db %01110000
     .db %10001000
     .db %10101000

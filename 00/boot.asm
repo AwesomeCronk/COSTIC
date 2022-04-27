@@ -138,23 +138,44 @@ Reboot:
     out (10h), a ; Contrast
 
     ; And from here start doing stuff
+
+    ; Splash screen
+    ; Load filesystem
+    ; Load /bin/init
     
     ; Splash screen
     ld de, $0000
-    ld c, $23
+    ld c, $43
     call PutChar
 
     ld de, $0100
-    ld c, $24
+    ld c, $4F
     call PutChar
 
     ld de, $0200
-    ld c, $25
-    call putChar
+    ld c, $53
+    call PutChar
 
-    ld a, 80
-    ld l, 80
-    call setPixel
+    ld de, $0300
+    ld c, $54
+    call PutChar
+
+    ld de, $0400
+    ld c, $49
+    call PutChar
+
+    ld de, $0500
+    ld c, $43
+    call PutChar
+
+    call GetBatteryLevel
+    ld a, b
+    ld c, $30
+    add a, c
+    ld c, a
+
+    ld de, $0002
+    call PutChar
 
     call FastCopy
 

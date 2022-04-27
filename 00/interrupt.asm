@@ -32,6 +32,8 @@ InterruptResume:
     bit 4, a
     jr nz, IntHandleLink
     jr SysInterruptDone ; Special case - RST $38
+
+; Triggered on boot-up
 IntHandleON:
     in a, (03h)
     res 0, a
@@ -40,6 +42,8 @@ IntHandleON:
     out (03h), a
     ; ON interrupt
     jr SysInterruptDone
+
+; Triggered on Timer 1
 IntHandleTimer1:
     in a, (03h)
     res 1, a
@@ -47,7 +51,16 @@ IntHandleTimer1:
     set 1, a
     out (03h), a
     ; Timer 1 interrupt
+    
+    ld de, $0505
+    ld c, $2B
+    call PutChar
+
+    call FastCopy
+
     jr SysInterruptDone
+
+; Triggered on Timer 1
 IntHandleTimer2:
     in a, (03h)
     res 2, a
@@ -56,6 +69,8 @@ IntHandleTimer2:
     out (03h), a
     ; Timer 2 interrupt
     jr SysInterruptDone
+
+; Triggered on link port event?
 IntHandleLink:
     in a, (03h)
     res 4, a
@@ -63,6 +78,8 @@ IntHandleLink:
     set 4, a
     out (03h), a
     ; Link interrupt
+
+; Returns to main execution
 SysInterruptDone:
     pop hl
     pop de
@@ -80,6 +97,7 @@ SysInterruptDone:
     ret
     
 #ifdef USB
+; Triggered on USB event
 USBInterrupt:
     in a, ($55) ; USB Interrupt status
     bit 0, a
